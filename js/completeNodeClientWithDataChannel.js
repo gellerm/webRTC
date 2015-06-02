@@ -56,7 +56,7 @@ var room = prompt('Enter room name:');
 
 // Connect to signaling server
 // var socket = io.connect("http://192.168.0.3:8181");
-var socket = io.connect("http://192.168.43.245:8181");
+var socket = io.connect("http://localhost:8181");
 
 
 // Send 'Create or join' message to singnaling server
