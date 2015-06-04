@@ -22,6 +22,7 @@ var remoteVideo = document.querySelector('#remoteVideo');
 var isChannelReady = false;
 var isInitiator = false;
 var isStarted = false;
+var webcamExists= null;  
 
 // WebRTC data structures
 // Streams
@@ -65,12 +66,14 @@ var constraints = {video: true, audio: true};
 
 function handleUserMedia(stream) {
         localStream = stream;
+        webcamExists = true;
         attachMediaStream(localVideo, stream);
         console.log('Adding local stream.');
         sendMessage('got user media');
 }
 
 function handleUserMediaError(error){
+		webcamExists = false;
         console.log('navigator.getUserMedia error: ', error);
 }
 
@@ -154,12 +157,13 @@ function sendMessage(message){
 // Channel negotiation trigger function
 function checkAndStart() {
 
-  if (!isStarted && typeof localStream != 'undefined' && isChannelReady) {
+// If local webcam does not exist, we start the connection anyway and expect remote video only
+  if (!isStarted && isChannelReady && (typeof localStream != 'undefined' || webcamExists == false) ) {
         createPeerConnection();
-    isStarted = true;
-    if (isInitiator) {
-      doCall();
-    }
+        isStarted = true;
+        if (isInitiator) {
+        	doCall();
+        }
   }
 }
 
@@ -168,8 +172,10 @@ function createPeerConnection() {
   try {
     pc = new RTCPeerConnection(pc_config, pc_constraints);
 
-    pc.addStream(localStream);
-
+    if (typeof localStream != 'undefined') {
+    	pc.addStream(localStream);
+    }
+    	
     pc.onicecandidate = handleIceCandidate;
     console.log('Created RTCPeerConnnection with:\n' +
       '  config: \'' + JSON.stringify(pc_config) + '\';\n' +

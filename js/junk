@@ -1,6 +1,0 @@
-    var theRoom = io.sockets.adapter.rooms[room]; 
-    if (typeof theRoom === "object") {
-    	numClients = Object.keys(theRoom).length;
-    }
-
-    
